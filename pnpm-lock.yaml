@@ -17,6 +17,9 @@ importers:
       '@ant-design/icons':
         specifier: ^6.1.0
         version: 6.1.0(react-dom@18.3.1)(react@18.3.1)
+      '@ant-design/nextjs-registry':
+        specifier: ^1.3.0
+        version: 1.3.0(@ant-design/cssinjs@2.0.1)(antd@6.1.2)(next@14.2.3)(react-dom@18.3.1)(react@18.3.1)
       '@ant-design/pro-components':
         specifier: ^2.8.10
         version: 2.8.10(antd@6.1.2)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
@@ -167,6 +170,22 @@ packages:
       '@ant-design/icons-svg': 4.4.2
       '@rc-component/util': 1.6.2(react-dom@18.3.1)(react@18.3.1)
       clsx: 2.1.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    dev: false
+
+  /@ant-design/nextjs-registry@1.3.0(@ant-design/cssinjs@2.0.1)(antd@6.1.2)(next@14.2.3)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-lHlg5bnj3LPYHUD+iZsO1k11NhIrx1mLWh2DXQ0m3Ly3OSaYfgeHX0WoVXxdVjEGjjYnPTe+OUY7YvU/p1aPZw==}
+    peerDependencies:
+      '@ant-design/cssinjs': '>=1.0.0'
+      antd: '>=5.0.0'
+      next: '>=14.0.0'
+      react: '>=16.0.0'
+      react-dom: '>=16.0.0'
+    dependencies:
+      '@ant-design/cssinjs': 2.0.1(react-dom@18.3.1)(react@18.3.1)
+      antd: 6.1.2(react-dom@18.3.1)(react@18.3.1)
+      next: 14.2.3(react-dom@18.3.1)(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     dev: false

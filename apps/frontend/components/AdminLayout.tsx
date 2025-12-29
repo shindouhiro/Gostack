@@ -1,9 +1,9 @@
 'use client'
 
 import { ProLayout } from '@ant-design/pro-components'
-import { useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
-import { App, Button, Dropdown, Space, ConfigProvider, theme } from 'antd'
+import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
+import { App, Button, Dropdown, Space, ConfigProvider, theme, Spin } from 'antd'
 import {
   UserOutlined,
   SettingOutlined,
@@ -19,8 +19,13 @@ import Link from 'next/link'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
-  const router = useRouter()
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
+
+  // 解决 SSR 水合问题
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const menuItems = [
     {
@@ -67,6 +72,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     },
   ]
 
+  // SSR 时显示 loading
+  if (!mounted) {
+    return (
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#f5f7fa',
+      }}>
+        <Spin size="large" />
+      </div>
+    )
+  }
+
   return (
     <ConfigProvider
       theme={{
@@ -74,6 +94,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         token: {
           colorPrimary: '#1677ff',
           borderRadius: 8,
+          colorBgLayout: '#f5f7fa',
+        },
+        components: {
+          Menu: {
+            itemBg: 'transparent',
+            subMenuItemBg: 'transparent',
+          },
         },
       }}
     >
@@ -139,6 +166,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {!collapsed && <span style={{ fontSize: 16, fontWeight: 600, color: '#1f1f1f' }}>{title}</span>}
             </Link>
           )}
+          bgLayoutImgList={[]}
           token={{
             sider: {
               colorMenuBackground: '#fff',
