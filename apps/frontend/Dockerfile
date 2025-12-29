@@ -7,10 +7,10 @@ WORKDIR /app
 RUN npm install -g pnpm
 
 # 复制 package.json
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json ./
 
-# 安装依赖
-RUN pnpm install --frozen-lockfile
+# 安装依赖（不使用 frozen-lockfile，因为 lockfile 在根目录）
+RUN pnpm install
 
 # 构建阶段
 FROM node:20-alpine AS builder
