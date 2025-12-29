@@ -7,15 +7,10 @@ on:
       - main
     tags:
       - 'v*'
-    paths:
-      - 'apps/frontend/**'
-      - '.github/workflows/frontend.yml'
   pull_request:
     branches:
       - master
       - main
-    paths:
-      - 'apps/frontend/**'
   workflow_dispatch:
 
 env:
