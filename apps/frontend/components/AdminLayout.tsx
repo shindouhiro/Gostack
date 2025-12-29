@@ -2,7 +2,7 @@
 
 import { ProLayout } from '@ant-design/pro-components'
 import { useState, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { App, Button, Dropdown, Space, ConfigProvider, theme, Spin } from 'antd'
 import {
   UserOutlined,
@@ -16,11 +16,15 @@ import {
   TagsOutlined,
 } from '@ant-design/icons'
 import Link from 'next/link'
+import { useAuth, useRequireAuth } from '@/hooks/useAuth'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+  const { user, logout, loading: authLoading } = useAuth()
+  const { isAuthenticated } = useRequireAuth()
 
   // 解决 SSR 水合问题
   useEffect(() => {
@@ -32,6 +36,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       path: '/admin',
       name: '仪表盘',
       icon: <DashboardOutlined />,
+      exact: true,
     },
     {
       path: '/admin/categories',
@@ -49,6 +54,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       icon: <TagsOutlined />,
     },
   ]
+
+  // 获取当前选中的菜单 key
+  const getSelectedKeys = () => {
+    // 精确匹配 /admin
+    if (pathname === '/admin') return ['/admin']
+    // 匹配子路由
+    const item = menuItems.find(m => m.path !== '/admin' && pathname.startsWith(m.path))
+    return item ? [item.path] : ['/admin']
+  }
+
+  const handleMenuClick = ({ key }: { key: string }) => {
+    if (key === 'logout') {
+      logout()
+    } else if (key === 'profile') {
+      router.push('/admin/profile')
+    } else if (key === 'settings') {
+      router.push('/admin/settings')
+    }
+  }
 
   const userMenuItems = [
     {
@@ -72,8 +96,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     },
   ]
 
-  // SSR 时显示 loading
-  if (!mounted) {
+  // SSR 时显示 loading 或未认证时
+  if (!mounted || authLoading) {
     return (
       <div style={{
         height: '100vh',
@@ -128,6 +152,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           collapsed={collapsed}
           onCollapse={setCollapsed}
           location={{ pathname }}
+          selectedKeys={getSelectedKeys()}
           route={{
             path: '/admin',
             routes: menuItems,
@@ -146,12 +171,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           )}
           avatarProps={{
-            src: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+            src: user?.Avatar || 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
             size: 'small',
-            title: '管理员',
+            title: user?.Nickname || user?.Username || '管理员',
             render: (props, dom) => (
               <Dropdown
-                menu={{ items: userMenuItems }}
+                menu={{ items: userMenuItems, onClick: handleMenuClick }}
                 placement="bottomRight"
               >
                 <Space style={{ cursor: 'pointer' }}>

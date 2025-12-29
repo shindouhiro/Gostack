@@ -1,9 +1,11 @@
 package main
 
 import (
+	"myapp/backend/models"
 	_ "myapp/backend/routers"
-	beego "github.com/beego/beego/v2/server/web"
+
 	"github.com/beego/beego/v2/client/orm"
+	beego "github.com/beego/beego/v2/server/web"
 	"github.com/beego/beego/v2/server/web/filter/cors"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -16,6 +18,9 @@ func init() {
 
 	// 自动建表 (开发模式)
 	orm.RunSyncdb("default", false, true)
+
+	// 初始化管理员账号
+	models.InitAdminUser()
 }
 
 func main() {

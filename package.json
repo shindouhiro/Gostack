@@ -8,6 +8,7 @@
     "dev": "concurrently -n \"frontend,backend\" -c \"cyan,green\" \"pnpm run frontend\" \"pnpm run backend\"",
     "frontend": "cd apps/frontend && pnpm dev",
     "backend": "cd apps/backend && air",
+    "seed": "cd apps/backend && go run cmd/seed/main.go",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f mysql",

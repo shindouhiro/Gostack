@@ -25,7 +25,7 @@ const requestInterceptor = (url: string, config: RequestConfig): RequestConfig =
   }
 
   // 添加 token（如果有）
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
   if (token) {
     (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`
   }
