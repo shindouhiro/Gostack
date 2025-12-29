@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Table, Button, Space, Modal, Form, Input, InputNumber,
   Popconfirm, Card, Tag, Tooltip, Select, Empty
@@ -23,22 +23,31 @@ export default function CategoryManagement() {
   const [searchText, setSearchText] = useState('')
   const [form] = Form.useForm()
 
+  // 监听 Modal 显示状态与编辑数据
+  useEffect(() => {
+    if (modalVisible) {
+      if (editingCategory) {
+        form.setFieldsValue({
+          Name: editingCategory.Name,
+          ParentId: editingCategory.ParentId,
+          Order: editingCategory.Order,
+        })
+      } else {
+        form.resetFields()
+        form.setFieldsValue({ ParentId: 0, Order: 0 })
+      }
+    }
+  }, [modalVisible, editingCategory, form])
+
   // 新增
   const handleAdd = () => {
     setEditingCategory(null)
-    form.resetFields()
-    form.setFieldsValue({ ParentId: 0, Order: 0 })
     setModalVisible(true)
   }
 
   // 编辑
   const handleEdit = (record: Category) => {
     setEditingCategory(record)
-    form.setFieldsValue({
-      Name: record.Name,
-      ParentId: record.ParentId,
-      Order: record.Order,
-    })
     setModalVisible(true)
   }
 
@@ -234,7 +243,7 @@ export default function CategoryManagement() {
         okText={editingCategory ? '保存' : '创建'}
         cancelText="取消"
         confirmLoading={actionLoading}
-        destroyOnClose
+        destroyOnHidden
         width={480}
       >
         <Form

@@ -1,7 +1,7 @@
 'use client'
 
 import AdminLayout from '@/components/AdminLayout'
-import { Card, Row, Col, Statistic, Space, Typography, List, Tag, Progress } from 'antd'
+import { Card, Row, Col, Statistic, Space, Typography, Tag, Progress, Divider } from 'antd'
 import {
   AppstoreOutlined,
   FileTextOutlined,
@@ -121,20 +121,20 @@ export default function AdminDashboardPage() {
             }
             styles={{ body: { padding: 0 } }}
           >
-            <List
-              dataSource={quickStats}
-              renderItem={(item) => (
-                <List.Item style={{ padding: '16px 24px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+            <div>
+              {quickStats.map((item, index) => (
+                <div key={index}>
+                  <div style={{ padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text>{item.label}</Text>
                     <Space>
                       <span style={{ fontWeight: 600, fontSize: 16 }}>{item.value}</span>
                       <Tag color="success" style={{ margin: 0 }}>{item.trend}</Tag>
                     </Space>
                   </div>
-                </List.Item>
-              )}
-            />
+                  {index < quickStats.length - 1 && <Divider style={{ margin: 0 }} />}
+                </div>
+              ))}
+            </div>
           </Card>
         </Col>
 
@@ -149,12 +149,11 @@ export default function AdminDashboardPage() {
             }
             styles={{ body: { padding: 0 } }}
           >
-            <List
-              dataSource={recentActivities}
-              renderItem={(item) => (
-                <List.Item style={{ padding: '12px 24px' }}>
-                  <List.Item.Meta
-                    title={
+            <div>
+              {recentActivities.map((item, index) => (
+                <div key={index}>
+                  <div style={{ padding: '12px 24px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Space>
                         <Text>{item.action}</Text>
                         <Tag color={
@@ -165,17 +164,16 @@ export default function AdminDashboardPage() {
                           {item.target}
                         </Tag>
                       </Space>
-                    }
-                    description={
                       <Text type="secondary" style={{ fontSize: 12 }}>
                         <ClockCircleOutlined style={{ marginRight: 4 }} />
                         {item.time}
                       </Text>
-                    }
-                  />
-                </List.Item>
-              )}
-            />
+                    </div>
+                  </div>
+                  {index < recentActivities.length - 1 && <Divider style={{ margin: 0 }} />}
+                </div>
+              ))}
+            </div>
           </Card>
         </Col>
       </Row>

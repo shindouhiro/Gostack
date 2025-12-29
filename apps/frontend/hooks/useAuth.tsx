@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, createContext, useContext } from 'react'
 import { useRouter } from 'next/navigation'
-import { message } from 'antd'
+import { App } from 'antd'
 import authApi, { UserInfo, LoginParams } from '@/api/auth'
 
 // Token 存储 key
@@ -62,6 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const { message } = App.useApp()
 
   // 获取用户信息
   const refreshUser = useCallback(async () => {
@@ -118,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       message.error('登录失败，请检查网络')
       return false
     }
-  }, [])
+  }, [message])
 
   // 登出
   const logout = useCallback(async () => {
@@ -132,7 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       router.push('/login')
       message.success('已退出登录')
     }
-  }, [router])
+  }, [router, message])
 
   return (
     <AuthContext.Provider

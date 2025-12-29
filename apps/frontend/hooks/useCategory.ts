@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { message } from 'antd'
+import { App } from 'antd'
 import categoryApi, { Category, CreateCategoryParams, UpdateCategoryParams } from '@/api/category'
 
 // 分类列表 Hook
@@ -40,6 +40,7 @@ export function useCategories() {
 // 分类操作 Hook
 export function useCategoryActions() {
   const [loading, setLoading] = useState(false)
+  const { message } = App.useApp()
 
   // 创建分类
   const createCategory = useCallback(async (data: CreateCategoryParams) => {
@@ -53,7 +54,7 @@ export function useCategoryActions() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [message])
 
   // 更新分类
   const updateCategory = useCallback(async (id: number, data: UpdateCategoryParams) => {
@@ -67,7 +68,7 @@ export function useCategoryActions() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [message])
 
   // 删除分类
   const deleteCategory = useCallback(async (id: number) => {
@@ -81,7 +82,7 @@ export function useCategoryActions() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [message])
 
   return {
     loading,

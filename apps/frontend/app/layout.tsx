@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { AntdRegistry } from '@ant-design/nextjs-registry';
+import { App } from 'antd';
 import { AuthProvider } from '@/hooks/useAuth';
 import "./globals.css";
 
@@ -20,9 +21,11 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body className={inter.className}>
         <AntdRegistry>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
+          <App>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </App>
         </AntdRegistry>
       </body>
     </html>
