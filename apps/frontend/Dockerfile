@@ -10,7 +10,7 @@ RUN npm install -g pnpm
 COPY package.json ./
 
 # 安装依赖（不使用 frozen-lockfile，因为 lockfile 在根目录）
-RUN pnpm install
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store pnpm install
 
 # 构建阶段
 FROM node:20-alpine AS builder
@@ -29,7 +29,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
 # 构建
-RUN pnpm build
+RUN --mount=type=cache,target=/app/.next/cache pnpm build
 
 # 运行阶段
 FROM node:20-alpine AS runner
