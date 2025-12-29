@@ -1,0 +1,27 @@
+# 依赖
+vendor/
+
+# 构建产物
+tmp/
+main
+*.exe
+
+# 开发文件
+.git/
+.gitignore
+.air.toml
+*.md
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# 测试
+*_test.go
+coverage/
+
+# 其他
+.DS_Store
+Thumbs.db

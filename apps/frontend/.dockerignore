@@ -1,0 +1,29 @@
+# 依赖
+node_modules/
+vendor/
+
+# 构建产物
+.next/
+out/
+dist/
+tmp/
+
+# 开发文件
+.git/
+.gitignore
+.env*.local
+*.md
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# 测试
+coverage/
+*.test
+
+# 其他
+.DS_Store
+Thumbs.db
