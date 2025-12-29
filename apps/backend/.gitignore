@@ -1,0 +1,26 @@
+# Air 临时目录
+tmp/
+
+# 编译产物
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+main
+
+# 测试
+*.test
+*.out
+
+# Go 依赖
+/vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 其他
+.DS_Store

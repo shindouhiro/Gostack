@@ -9,7 +9,5 @@ type MainController struct {
 }
 
 func (c *MainController) Get() {
-	c.Data["Website"] = "beego.me"
-	c.Data["Email"] = "astaxie@gmail.com"
-	c.Ctx.Output.Body([]byte("Hello from Beego Backend!"))
+	c.Ctx.Output.Body([]byte("haha123"))
 }

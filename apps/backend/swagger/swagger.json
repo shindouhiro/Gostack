@@ -1,0 +1,185 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Message Board API",
+    "description": "留言板 API 文档",
+    "version": "1.0.0",
+    "contact": {
+      "email": "admin@example.com"
+    }
+  },
+  "basePath": "/v1",
+  "paths": {
+    "/categories": {
+      "get": {
+        "tags": [
+          "categories"
+        ],
+        "summary": "获取所有分类",
+        "description": "返回所有分类列表",
+        "operationId": "CategoryController.GetAll",
+        "responses": {
+          "200": {
+            "description": "成功返回分类列表",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Category"
+              }
+            }
+          },
+          "403": {
+            "description": "获取失败"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "categories"
+        ],
+        "summary": "创建分类",
+        "description": "创建一个新的分类",
+        "operationId": "CategoryController.Post",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "分类对象",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Category"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "创建成功",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "请求体为空"
+          }
+        }
+      }
+    },
+    "/categories/{id}": {
+      "get": {
+        "tags": [
+          "categories"
+        ],
+        "summary": "获取单个分类",
+        "description": "根据 ID 获取分类详情",
+        "operationId": "CategoryController.GetOne",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "分类 ID",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功返回分类",
+            "schema": {
+              "$ref": "#/definitions/Category"
+            }
+          },
+          "403": {
+            "description": "ID 为空"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "categories"
+        ],
+        "summary": "更新分类",
+        "description": "根据 ID 更新分类",
+        "operationId": "CategoryController.Put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "分类 ID",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "分类对象",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Category"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "更新成功"
+          },
+          "403": {
+            "description": "ID 为空"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "categories"
+        ],
+        "summary": "删除分类",
+        "description": "根据 ID 删除分类",
+        "operationId": "CategoryController.Delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "分类 ID",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "删除成功"
+          },
+          "403": {
+            "description": "ID 为空"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Category": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "type": "integer",
+          "description": "分类 ID"
+        },
+        "Name": {
+          "type": "string",
+          "description": "分类名称"
+        },
+        "ParentId": {
+          "type": "integer",
+          "description": "父分类 ID"
+        },
+        "Order": {
+          "type": "integer",
+          "description": "排序"
+        }
+      }
+    }
+  }
+}

@@ -1,154 +1,151 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Table, Button, Space, Modal, Form, Input, InputNumber, message, Popconfirm } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { useState } from 'react'
+import {
+  Table, Button, Space, Modal, Form, Input, InputNumber,
+  Popconfirm, Card, Tag, Tooltip, Select, Empty
+} from 'antd'
+import {
+  PlusOutlined, EditOutlined, DeleteOutlined,
+  ReloadOutlined, SearchOutlined, FolderOutlined,
+  AppstoreOutlined,
+} from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
-
-interface Category {
-  id: number
-  name: string
-  parent_id: number
-  order: number
-}
+import { useCategories, useCategoryActions, getParentCategoryName } from '@/hooks/useCategory'
+import type { Category, CreateCategoryParams } from '@/api/category'
 
 export default function CategoryManagement() {
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(false)
+  const { categories, loading, refresh } = useCategories()
+  const { createCategory, updateCategory, deleteCategory, loading: actionLoading } = useCategoryActions()
+
   const [modalVisible, setModalVisible] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [searchText, setSearchText] = useState('')
   const [form] = Form.useForm()
 
-  const fetchCategories = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch('/api/categories')
-      if (response.ok) {
-        const data = await response.json()
-        setCategories(data)
-      } else {
-        message.error('获取分类列表失败')
-      }
-    } catch (error) {
-      message.error('网络错误')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchCategories()
-  }, [])
-
+  // 新增
   const handleAdd = () => {
     setEditingCategory(null)
     form.resetFields()
+    form.setFieldsValue({ ParentId: 0, Order: 0 })
     setModalVisible(true)
   }
 
+  // 编辑
   const handleEdit = (record: Category) => {
     setEditingCategory(record)
     form.setFieldsValue({
-      name: record.name,
-      parent_id: record.parent_id,
-      order: record.order,
+      Name: record.Name,
+      ParentId: record.ParentId,
+      Order: record.Order,
     })
     setModalVisible(true)
   }
 
+  // 删除
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(`/api/categories/${id}`, {
-        method: 'DELETE',
-      })
-      if (response.ok) {
-        message.success('删除成功')
-        fetchCategories()
-      } else {
-        message.error('删除失败')
-      }
+      await deleteCategory(id)
+      refresh()
     } catch (error) {
-      message.error('网络错误')
+      // 错误已在 hook 中处理
     }
   }
 
-  const handleSubmit = async (values: any) => {
+  // 提交表单
+  const handleSubmit = async (values: CreateCategoryParams) => {
     try {
-      const url = editingCategory 
-        ? `/api/categories/${editingCategory.id}`
-        : '/api/categories'
-      const method = editingCategory ? 'PUT' : 'POST'
-      
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      })
-
-      if (response.ok) {
-        message.success(editingCategory ? '更新成功' : '创建成功')
-        setModalVisible(false)
-        fetchCategories()
+      if (editingCategory) {
+        await updateCategory(editingCategory.Id, values)
       } else {
-        message.error(editingCategory ? '更新失败' : '创建失败')
+        await createCategory(values)
       }
+      setModalVisible(false)
+      refresh()
     } catch (error) {
-      message.error('网络错误')
+      // 错误已在 hook 中处理
     }
   }
+
+  // 搜索过滤
+  const filteredCategories = categories.filter(c =>
+    c.Name.toLowerCase().includes(searchText.toLowerCase())
+  )
 
   const columns: ColumnsType<Category> = [
     {
       title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
+      dataIndex: 'Id',
+      key: 'Id',
       width: 80,
+      sorter: (a, b) => a.Id - b.Id,
     },
     {
       title: '分类名称',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'Name',
+      key: 'Name',
+      render: (text) => (
+        <Space>
+          <FolderOutlined style={{ color: '#1677ff' }} />
+          <span style={{ fontWeight: 500 }}>{text}</span>
+        </Space>
+      ),
     },
     {
-      title: '父级ID',
-      dataIndex: 'parent_id',
-      key: 'parent_id',
-      width: 100,
+      title: '父级分类',
+      dataIndex: 'ParentId',
+      key: 'ParentId',
+      width: 150,
+      render: (parentId) => (
+        parentId === 0
+          ? <Tag color="default">顶级分类</Tag>
+          : <Tag color="blue">{getParentCategoryName(categories, parentId)}</Tag>
+      ),
     },
     {
       title: '排序',
-      dataIndex: 'order',
-      key: 'order',
-      width: 80,
+      dataIndex: 'Order',
+      key: 'Order',
+      width: 100,
+      sorter: (a, b) => a.Order - b.Order,
+      render: (order) => (
+        <Tag color="geekblue">{order}</Tag>
+      ),
     },
     {
       title: '操作',
       key: 'action',
-      width: 150,
+      width: 180,
       render: (_, record) => (
-        <Space size="middle">
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          >
-            编辑
-          </Button>
+        <Space size="small">
+          <Tooltip title="编辑">
+            <Button
+              type="primary"
+              ghost
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
+            >
+              编辑
+            </Button>
+          </Tooltip>
           <Popconfirm
-            title="确定要删除这个分类吗？"
-            onConfirm={() => handleDelete(record.id)}
+            title="删除确认"
+            description="确定要删除这个分类吗？"
+            onConfirm={() => handleDelete(record.Id)}
             okText="确定"
             cancelText="取消"
+            okButtonProps={{ danger: true }}
           >
-            <Button
-              type="link"
-              danger
-              icon={<DeleteOutlined />}
-            >
-              删除
-            </Button>
+            <Tooltip title="删除">
+              <Button
+                danger
+                size="small"
+                icon={<DeleteOutlined />}
+              >
+                删除
+              </Button>
+            </Tooltip>
           </Popconfirm>
         </Space>
       ),
@@ -156,75 +153,144 @@ export default function CategoryManagement() {
   ]
 
   return (
-    <div>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
-        <h2>分类管理</h2>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleAdd}
-        >
-          新增分类
-        </Button>
-      </div>
-
+    <Card
+      title={
+        <Space>
+          <AppstoreOutlined style={{ fontSize: 20, color: '#1677ff' }} />
+          <span style={{ fontSize: 18, fontWeight: 600 }}>分类管理</span>
+        </Space>
+      }
+      extra={
+        <Space>
+          <Input
+            placeholder="搜索分类..."
+            prefix={<SearchOutlined />}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ width: 200 }}
+            allowClear
+          />
+          <Tooltip title="刷新">
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={refresh}
+              loading={loading}
+            />
+          </Tooltip>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAdd}
+          >
+            新增分类
+          </Button>
+        </Space>
+      }
+      styles={{
+        header: {
+          borderBottom: '1px solid #f0f0f0',
+        },
+        body: {
+          padding: 0,
+        },
+      }}
+    >
       <Table
         columns={columns}
-        dataSource={categories}
-        rowKey="id"
+        dataSource={filteredCategories}
+        rowKey="Id"
         loading={loading}
         pagination={{
           pageSize: 10,
           showSizeChanger: true,
           showQuickJumper: true,
+          showTotal: (total) => `共 ${total} 条`,
         }}
+        locale={{
+          emptyText: (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="暂无分类数据"
+            >
+              <Button type="primary" onClick={handleAdd}>
+                立即创建
+              </Button>
+            </Empty>
+          ),
+        }}
+        style={{ margin: 0 }}
       />
 
       <Modal
-        title={editingCategory ? '编辑分类' : '新增分类'}
+        title={
+          <Space>
+            {editingCategory ? <EditOutlined /> : <PlusOutlined />}
+            {editingCategory ? '编辑分类' : '新增分类'}
+          </Space>
+        }
         open={modalVisible}
         onCancel={() => setModalVisible(false)}
         onOk={() => form.submit()}
+        okText={editingCategory ? '保存' : '创建'}
+        cancelText="取消"
+        confirmLoading={actionLoading}
         destroyOnClose
+        width={480}
       >
         <Form
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
+          style={{ marginTop: 24 }}
         >
           <Form.Item
             label="分类名称"
-            name="name"
-            rules={[{ required: true, message: '请输入分类名称' }]}
+            name="Name"
+            rules={[
+              { required: true, message: '请输入分类名称' },
+              { max: 50, message: '分类名称不能超过50个字符' },
+            ]}
           >
-            <Input placeholder="请输入分类名称" />
+            <Input
+              placeholder="请输入分类名称"
+              prefix={<FolderOutlined />}
+              maxLength={50}
+              showCount
+            />
           </Form.Item>
 
           <Form.Item
-            label="父级ID"
-            name="parent_id"
+            label="父级分类"
+            name="ParentId"
             initialValue={0}
           >
-            <InputNumber
-              min={0}
-              placeholder="请输入父级ID"
-              style={{ width: '100%' }}
+            <Select
+              placeholder="选择父级分类"
+              allowClear
+              options={[
+                { value: 0, label: '顶级分类' },
+                ...categories
+                  .filter(c => c.Id !== editingCategory?.Id)
+                  .map(c => ({ value: c.Id, label: c.Name })),
+              ]}
             />
           </Form.Item>
 
           <Form.Item
             label="排序"
-            name="order"
+            name="Order"
             initialValue={0}
+            tooltip="数值越小越靠前"
           >
             <InputNumber
               min={0}
+              max={999}
               placeholder="请输入排序值"
               style={{ width: '100%' }}
             />
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </Card>
   )
 }
